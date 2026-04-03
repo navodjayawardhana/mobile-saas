@@ -5,17 +5,14 @@ import { IRootState } from '../../store';
 import { toggleTheme, toggleSidebar } from '../../store/themeConfigSlice';
 import Dropdown from '../Dropdown';
 import { useLogoutMutation, useGetMeQuery } from '../../store/api/authApi';
-import { useGetShopSettingsQuery } from '../../store/api/settingsApi';
 
 const Header = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [logout] = useLogoutMutation();
-    const { data: shopData } = useGetShopSettingsQuery();
     const { data: userData } = useGetMeQuery();
 
-    const shop = shopData?.shop;
     const user = userData?.user;
 
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl';
@@ -69,20 +66,6 @@ const Header = () => {
                             <path d="M20 17L4 17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                         </svg>
                     </button>
-
-                    {/* Shop Logo and Name */}
-                    <Link to="/" className="flex items-center gap-2.5">
-                        {shop?.logo ? (
-                            <img className="w-8 h-8 rounded-full object-cover" src={shop.logo} alt={shop.name} />
-                        ) : (
-                            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm">
-                                {shop?.name?.charAt(0)?.toUpperCase() || 'S'}
-                            </div>
-                        )}
-                        <span className="text-lg font-semibold text-gray-800 dark:text-white-light hidden sm:block">
-                            {shop?.name || 'Shop'}
-                        </span>
-                    </Link>
 
                     {/* Right side controls */}
                     <div className="flex items-center gap-2 ltr:ml-auto rtl:mr-auto dark:text-[#d0d2d6]">
