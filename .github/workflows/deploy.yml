@@ -1,0 +1,86 @@
+name: Build & Deploy to cPanel (Mobile Shop)
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ── Frontend Build ──
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Node dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Build frontend
+        run: npm run build
+
+      # ── Backend Setup ──
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, ctype, iconv, pdo_mysql, dom, gd, zip, bcmath
+          coverage: none
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install Composer dependencies
+        run: composer install --no-dev --optimize-autoloader --no-interaction
+
+      # ── Deploy to mobile.rfrma.com ──
+      - name: Deploy to mobile.rfrma.com
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          port: 21
+          local-dir: ./
+          server-dir: ./
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/tests/**
+            **/.env
+            **/.env.example
+            **/.env.backup
+            **/.env.production
+            **/phpunit.xml
+            **/.phpunit.cache/**
+            **/.claude/**
+
+      # ── Run Migrations via HTTP Webhook ──
+      - name: Run migrations on mobile.rfrma.com
+        run: |
+          response=$(curl -sk -w "\n%{http_code}" "https://mobile.rfrma.com/deploy-migrate.php?token=${{ secrets.DEPLOY_TOKEN }}")
+          http_code=$(echo "$response" | tail -1)
+          body=$(echo "$response" | head -n -1)
+          echo "$body"
+          if [ "$http_code" != "200" ]; then
+            echo "Migration failed with HTTP $http_code"
+            exit 1
+          fi
