@@ -7,8 +7,23 @@
  * Usage: https://mobile.rfrma.com/deploy-migrate.php?token=YOUR_SECRET_TOKEN
  */
 
-// Security: Check deploy token
-$expectedToken = getenv('DEPLOY_TOKEN') ?: 'your-secret-deploy-token-here';
+// Change to Laravel root directory first
+chdir(dirname(__DIR__));
+
+// Load .env file to get DEPLOY_TOKEN
+$envFile = dirname(__DIR__) . '/.env';
+$expectedToken = 'your-secret-deploy-token-here';
+
+if (file_exists($envFile)) {
+    $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos($line, 'DEPLOY_TOKEN=') === 0) {
+            $expectedToken = trim(str_replace('DEPLOY_TOKEN=', '', $line), '"\'');
+            break;
+        }
+    }
+}
+
 $providedToken = $_GET['token'] ?? '';
 
 if ($providedToken !== $expectedToken) {
@@ -19,9 +34,6 @@ if ($providedToken !== $expectedToken) {
 
 // Set content type
 header('Content-Type: application/json');
-
-// Change to Laravel root directory
-chdir(dirname(__DIR__));
 
 $output = [];
 $returnCode = 0;
