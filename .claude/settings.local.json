@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(composer require:*)",
+      "Bash(npm install:*)",
+      "Bash(npx vite build)",
+      "Bash(find:*)",
+      "Bash(php artisan config:clear:*)",
+      "Bash(php artisan tinker:*)",
+      "Bash(php artisan migrate:*)",
+      "Bash(php artisan make:migration:*)",
+      "Bash(git init:*)",
+      "Bash(git remote add:*)"
+    ]
+  }
+}
