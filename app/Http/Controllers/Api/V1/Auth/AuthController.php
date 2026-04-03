@@ -9,6 +9,7 @@ use App\Models\Permission;
 use App\Models\Role;
 use App\Models\Shop;
 use App\Models\User;
+use App\Services\TimezoneDetector;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -34,22 +35,27 @@ class AuthController extends Controller
         try {
             DB::beginTransaction();
 
+            // Detect timezone and currency from user's IP
+            $locationData = TimezoneDetector::fromIp($request->ip());
+            $currencyCode = $locationData['currency'];
+            $currencyDetails = TimezoneDetector::getCurrencyDetails($currencyCode);
+
             // Create shop
             $shop = Shop::create([
                 'name' => $request->shop_name,
                 'slug' => Str::slug($request->shop_name) . '-' . Str::random(6),
                 'email' => $request->email,
                 'phone' => $request->phone,
-                'timezone' => 'UTC',
+                'timezone' => $locationData['timezone'],
                 'subscription_plan' => 'free',
             ]);
 
-            // Create default currency
+            // Create default currency based on user's location
             $currency = Currency::create([
                 'shop_id' => $shop->id,
-                'code' => 'USD',
-                'name' => 'US Dollar',
-                'symbol' => '$',
+                'code' => $currencyCode,
+                'name' => $currencyDetails['name'],
+                'symbol' => $currencyDetails['symbol'],
                 'exchange_rate' => 1.000000,
                 'is_default' => true,
             ]);

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Settings;
 
 use App\Http\Controllers\Controller;
+use App\Services\TimezoneDetector;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -107,6 +108,41 @@ class ShopSettingsController extends Controller
 
         return response()->json([
             'message' => 'Logo deleted successfully',
+        ]);
+    }
+
+    /**
+     * Detect timezone from user's IP address.
+     */
+    public function detectTimezone(Request $request): JsonResponse
+    {
+        $locationData = TimezoneDetector::fromIp($request->ip());
+
+        return response()->json([
+            'timezone' => $locationData['timezone'],
+            'country' => $locationData['country'],
+            'country_code' => $locationData['country_code'],
+            'city' => $locationData['city'],
+            'currency' => $locationData['currency'],
+        ]);
+    }
+
+    /**
+     * Auto-update shop timezone based on IP.
+     */
+    public function autoUpdateTimezone(Request $request): JsonResponse
+    {
+        $shop = $request->user()->shop;
+        $locationData = TimezoneDetector::fromIp($request->ip());
+
+        $shop->update([
+            'timezone' => $locationData['timezone'],
+        ]);
+
+        return response()->json([
+            'message' => 'Timezone updated successfully',
+            'timezone' => $locationData['timezone'],
+            'country' => $locationData['country'],
         ]);
     }
 }

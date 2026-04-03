@@ -72,6 +72,8 @@ Route::prefix('v1')->group(function () {
             Route::put('/shop', [ShopSettingsController::class, 'update'])->middleware('permission:manage_shop_settings');
             Route::post('/shop/logo', [ShopSettingsController::class, 'uploadLogo'])->middleware('permission:manage_shop_settings');
             Route::delete('/shop/logo', [ShopSettingsController::class, 'deleteLogo'])->middleware('permission:manage_shop_settings');
+            Route::get('/shop/detect-timezone', [ShopSettingsController::class, 'detectTimezone']);
+            Route::post('/shop/auto-timezone', [ShopSettingsController::class, 'autoUpdateTimezone'])->middleware('permission:manage_shop_settings');
 
             // Currencies
             Route::get('/currencies', [CurrencyController::class, 'index']);
