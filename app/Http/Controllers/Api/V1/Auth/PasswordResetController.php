@@ -27,10 +27,9 @@ class PasswordResetController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (!$user) {
-            // Return success even if user doesn't exist (security best practice)
             return response()->json([
-                'message' => 'If an account with that email exists, we have sent a password reset link.',
-            ]);
+                'message' => 'No account found with this email address.',
+            ], 404);
         }
 
         // Delete any existing tokens for this email
@@ -59,12 +58,14 @@ class PasswordResetController extends Controller
                     ->subject('Reset Your Password - Mobile Shop');
             });
         } catch (\Exception $e) {
-            // Log error but don't expose to user
             \Log::error('Password reset email failed: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to send reset email. Please try again later.',
+            ], 500);
         }
 
         return response()->json([
-            'message' => 'If an account with that email exists, we have sent a password reset link.',
+            'message' => 'Password reset link has been sent to your email.',
         ]);
     }
 
