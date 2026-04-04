@@ -27,6 +27,12 @@ if ($returnCode !== 0) {
     exit;
 }
 
+// Run seeders (only if seed parameter is passed)
+$seederOutput = [];
+if (isset($_GET['seed'])) {
+    exec('php artisan db:seed --force 2>&1', $seederOutput, $seederCode);
+}
+
 // Clear and cache config/routes/views
 $cacheOutput = [];
 exec('php artisan config:cache 2>&1', $cacheOutput);
@@ -37,6 +43,7 @@ echo json_encode([
     'success' => true,
     'message' => 'Deployment completed successfully',
     'migration_output' => implode("\n", $output),
+    'seeder_output' => implode("\n", $seederOutput ?? []),
     'cache_output' => implode("\n", $cacheOutput),
     'timestamp' => date('Y-m-d H:i:s')
 ]);
