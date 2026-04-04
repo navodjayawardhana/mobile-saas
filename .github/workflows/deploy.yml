@@ -76,7 +76,7 @@ jobs:
       # ── Run Migrations via HTTP Webhook ──
       - name: Run migrations on mobile.rfrma.com
         run: |
-          response=$(curl -sk -w "\n%{http_code}" "https://mobile.rfrma.com/deploy-migrate.php?token=${{ secrets.DEPLOY_TOKEN }}")
+          response=$(curl -sk -w "\n%{http_code}" "https://mobile.rfrma.com/deploy-migrate.php")
           http_code=$(echo "$response" | tail -1)
           body=$(echo "$response" | head -n -1)
           echo "$body"

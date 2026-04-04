@@ -3,23 +3,10 @@
 /**
  * Deploy Migration Script
  * This script runs Laravel migrations after FTP deployment
- *
- * Usage: https://mobile.rfrma.com/deploy-migrate.php?token=YOUR_SECRET_TOKEN
  */
 
 // Change to Laravel root directory first
 chdir(dirname(__DIR__));
-
-// Deploy token - must match GitHub secret DEPLOY_TOKEN
-$expectedToken = 'mobile2024deploy';
-
-$providedToken = $_GET['token'] ?? '';
-
-if ($providedToken !== $expectedToken) {
-    http_response_code(403);
-    echo json_encode(['error' => 'Invalid token']);
-    exit;
-}
 
 // Set content type
 header('Content-Type: application/json');
