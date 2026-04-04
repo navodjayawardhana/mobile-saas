@@ -38,6 +38,12 @@ if (!file_exists($seededFile)) {
     }
 }
 
+// Create storage link if not exists
+$storageLink = dirname(__DIR__) . '/public/storage';
+if (!file_exists($storageLink)) {
+    exec('php artisan storage:link 2>&1', $storageLinkOutput);
+}
+
 // Clear and cache config/routes/views
 $cacheOutput = [];
 exec('php artisan config:cache 2>&1', $cacheOutput);
