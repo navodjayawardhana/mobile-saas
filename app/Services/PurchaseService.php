@@ -121,7 +121,7 @@ class PurchaseService
                     foreach ($itemData['serial_numbers'] as $serial) {
                         $warrantyExpires = null;
                         if ($product->warranty_months) {
-                            $warrantyExpires = now()->addMonths($product->warranty_months);
+                            $warrantyExpires = now()->addMonths((int) $product->warranty_months);
                         }
 
                         InventoryItem::create([

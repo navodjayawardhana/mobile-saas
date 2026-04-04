@@ -53,6 +53,7 @@ class Repair extends Model
         'estimated_completion' => 'datetime',
         'completed_at' => 'datetime',
         'delivered_at' => 'datetime',
+        'warranty_days' => 'integer',
     ];
 
     protected $appends = [

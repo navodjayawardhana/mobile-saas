@@ -47,7 +47,7 @@ class SaleService
                     'discount_amount' => $discount,
                     'total_price' => $totalPrice,
                     'inventory_item_id' => $itemData['inventory_item_id'] ?? null,
-                    'warranty_months' => $itemData['warranty_months'] ?? $product->warranty_months,
+                    'warranty_months' => (int) ($itemData['warranty_months'] ?? $product->warranty_months),
                 ];
 
                 $subtotal += $totalPrice;

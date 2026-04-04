@@ -43,6 +43,9 @@ class Product extends Model
         'is_active' => 'boolean',
         'specifications' => 'array',
         'images' => 'array',
+        'warranty_months' => 'integer',
+        'quantity' => 'integer',
+        'min_stock_alert' => 'integer',
     ];
 
     public function category(): BelongsTo

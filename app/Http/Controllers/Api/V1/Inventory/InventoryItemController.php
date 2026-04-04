@@ -102,7 +102,7 @@ class InventoryItemController extends Controller
 
         // Calculate warranty if product has warranty_months
         if (empty($validated['warranty_expires_at']) && $product->warranty_months) {
-            $validated['warranty_expires_at'] = now()->addMonths($product->warranty_months);
+            $validated['warranty_expires_at'] = now()->addMonths((int) $product->warranty_months);
         }
 
         $validated['condition'] = $validated['condition'] ?? 'new';
@@ -173,7 +173,7 @@ class InventoryItemController extends Controller
         foreach ($validated['items'] as $itemData) {
             $warrantyExpires = $itemData['warranty_expires_at'] ?? null;
             if (empty($warrantyExpires) && $product->warranty_months) {
-                $warrantyExpires = now()->addMonths($product->warranty_months);
+                $warrantyExpires = now()->addMonths((int) $product->warranty_months);
             }
 
             $item = InventoryItem::create([

@@ -30,6 +30,8 @@ class SaleItem extends Model
         'discount_amount' => 'decimal:2',
         'total_price' => 'decimal:2',
         'warranty_expires_at' => 'date',
+        'quantity' => 'integer',
+        'warranty_months' => 'integer',
     ];
 
     public function sale(): BelongsTo

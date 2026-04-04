@@ -297,7 +297,7 @@ class InstallmentController extends Controller
      */
     public function upcoming(Request $request): JsonResponse
     {
-        $days = $request->get('days', 7);
+        $days = (int) $request->get('days', 7);
 
         $installments = Installment::with([
             'installmentPlan.customer:id,name,phone',
