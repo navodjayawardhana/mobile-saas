@@ -27,10 +27,15 @@ if ($returnCode !== 0) {
     exit;
 }
 
-// Run seeders (only if seed parameter is passed)
+// Run seeders only on first deployment
 $seederOutput = [];
-if (isset($_GET['seed'])) {
+$seededFile = dirname(__DIR__) . '/storage/.seeded';
+
+if (!file_exists($seededFile)) {
     exec('php artisan db:seed --force 2>&1', $seederOutput, $seederCode);
+    if ($seederCode === 0) {
+        file_put_contents($seededFile, date('Y-m-d H:i:s'));
+    }
 }
 
 // Clear and cache config/routes/views
