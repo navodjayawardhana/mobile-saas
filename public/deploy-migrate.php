@@ -10,19 +10,8 @@
 // Change to Laravel root directory first
 chdir(dirname(__DIR__));
 
-// Load .env file to get DEPLOY_TOKEN
-$envFile = dirname(__DIR__) . '/.env';
-$expectedToken = 'your-secret-deploy-token-here';
-
-if (file_exists($envFile)) {
-    $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        if (strpos($line, 'DEPLOY_TOKEN=') === 0) {
-            $expectedToken = trim(str_replace('DEPLOY_TOKEN=', '', $line), '"\'');
-            break;
-        }
-    }
-}
+// Deploy token - must match GitHub secret DEPLOY_TOKEN
+$expectedToken = 'mobile2024deploy';
 
 $providedToken = $_GET['token'] ?? '';
 
