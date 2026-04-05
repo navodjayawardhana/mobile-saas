@@ -131,12 +131,7 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'sku' => [
-                'nullable',
-                'string',
-                'max:100',
-                Rule::unique('products')->where('shop_id', $request->user()->shop_id),
-            ],
+            'sku' => 'nullable|string|max:100',
             'barcode' => [
                 'nullable',
                 'string',
@@ -225,14 +220,7 @@ class ProductController extends Controller
 
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
-            'sku' => [
-                'nullable',
-                'string',
-                'max:100',
-                Rule::unique('products')
-                    ->where('shop_id', $request->user()->shop_id)
-                    ->ignore($product->id),
-            ],
+            'sku' => 'nullable|string|max:100',
             'barcode' => [
                 'nullable',
                 'string',
