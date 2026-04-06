@@ -153,27 +153,28 @@ class ProductController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        // Generate SKU if not provided
+        $initialQty = $validated['quantity'] ?? 0;
+
         if (empty($validated['sku'])) {
             $validated['sku'] = $this->generateSku($validated['type']);
         }
 
-        // Set defaults
         $validated['condition'] = $validated['condition'] ?? 'new';
-        $validated['quantity'] = $validated['quantity'] ?? 0;
         $validated['min_stock_alert'] = $validated['min_stock_alert'] ?? 5;
         $validated['warranty_months'] = $validated['warranty_months'] ?? 0;
         $validated['is_serialized'] = $validated['is_serialized'] ?? ($validated['type'] === 'phone');
         $validated['is_active'] = $validated['is_active'] ?? true;
 
+        $validated['quantity'] = 0;
+
+
         $product = Product::create($validated);
 
-        // Record initial stock if quantity > 0 and not serialized
-        if (!$product->is_serialized && $product->quantity > 0) {
+        if (!$product->is_serialized && $initialQty > 0) {
             $this->stockService->recordMovement(
                 $product,
                 'adjustment_in',
-                $product->quantity,
+                $initialQty,
                 null,
                 null,
                 'Initial stock'
@@ -182,7 +183,7 @@ class ProductController extends Controller
 
         return response()->json([
             'message' => 'Product created successfully',
-            'product' => $product->load(['category:id,name', 'brand:id,name']),
+            'product' => $product->fresh()->load(['category:id,name', 'brand:id,name']),
         ], 201);
     }
 
